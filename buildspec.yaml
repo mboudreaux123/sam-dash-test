@@ -17,5 +17,8 @@ phases:
   post_build:
     commands:
       - echo "Updating Lambda application..."
-      - aws lambda update-function-code --function-name sam-dash --zip-file fileb:deployment_package.zip
+      #- aws lambda update-function-code --function-name sam-dash --zip-file fileb:deployment_package.zip
+      - sam validate
+      - sam build
+      - sam deploy
       - echo "Done"
