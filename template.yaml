@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+  Api:
+    BinaryMediaTypes:
+      # The following is important for correct handling (b64) of binary data, e.g. png, jpg
+      - "*/*"
+
+Resources:
+  FrontendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: frontend/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Events:
+        # We want to capture both the root as well as everything after the root path
+        RootIntegration:
+          Type: Api
+          Properties:
+            Path: "/"
+            Method: ANY
+        ProxyIntegration:
+          Type: Api
+          Properties:
+            Path: "/{proxy+}"
+            Method: ANY
+
+Outputs:
+  ServerlessDashApi:
+    Description: "API Gateway endpoint URL for Prod stage for Serverless Dash App"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
